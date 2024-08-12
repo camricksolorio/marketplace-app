@@ -5,31 +5,38 @@ function UploadForm() {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [image, setImage] = useState(null);
-
+    const [status, setStatus] = useState(1);
 
     const handleSubmit = async (e) => {
         //prevents default HTML behavior, in this case for the <input> event 
         e.preventDefault();
 
+        // create formData object
         const formData = new FormData();
         formData.append('title', title);
         formData.append('description', description);
         formData.append('image', image);
+        formData.append('status', status);
+
 
         const timestamp = new Date().toISOString();
         formData.append('timestamp', timestamp);
 
-        try {
-            const response = await axios.post('http://localhost:5001/upload', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-
-            console.log('Upload successful:', response.data);
-        } catch (error) {
-            console.error('Error uploading the form data', error);
+        for (const pair of formData.entries()) {
+            console.log(pair[0], pair[1]);
         }
+
+        // try {
+        //     const response = await axios.post('http://localhost:5001/upload', formData, {
+        //         headers: {
+        //             'Content-Type': 'multipart/form-data',
+        //         },
+        //     });
+
+        //     console.log('Upload successful:', response.data);
+        // } catch (error) {
+        //     console.error('Error uploading the form data', error);
+        // }
     }
 
     return (
