@@ -34,16 +34,18 @@ mongoose.connect(mongoURI, {
 const itemSchema = new mongoose.Schema({
     title: String,
     description: String,
-    imageUrl: String
+    imageUrl: String,
+    status: Number,
+    timestamp: Date
 });
 const Item = mongoose.model('Item', itemSchema);
 
 // API endpoint for handling form data
 app.post('/upload', upload.single('image'), async (req, res) => {
-    const { title, description, timestamp } = req.body;
+    const { title, description, status, timestamp } = req.body;
     const imageUrl = req.file ? `/uploads/${path.basename(req.file.path)}` : null;
 
-    const newItem = new Item({ title, description, timestamp, imageUrl });
+    const newItem = new Item({ title, description, imageUrl, status, timestamp });
     await newItem.save();
 
     res.send({ message: 'Upload successful', item: newItem });
@@ -56,6 +58,23 @@ app.get('/items', async (req, res) => {
     } catch (error) {
         console.error('Error fetching items', error);
         res.status(500).send('Server error');
+    }
+});
+
+app.patch('/items/:id/status', async (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    try {
+        const updatedItem = await Item.findByIdAndUpdate(id, { status }, { new: true });
+        res.json(updatedItem);
+        console.log('ID:', id);
+        console.log('Status:', status);
+    } catch (error) {
+        res.status(500).send('Error at patch');
+        console.log('ID:', id);
+        console.log('Status:', status);
+
     }
 });
 
